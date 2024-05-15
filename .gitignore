@@ -1,0 +1,6 @@
+.DS_Store
+*.pyc
+venv
+.venv
+fontcExport.glyphsFileFormat/Contents/Resources/bin/
+fontcExport.glyphsFileFormat/Contents/Resources/fontc-*.dist-info/
