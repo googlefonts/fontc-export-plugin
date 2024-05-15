@@ -34,21 +34,22 @@ ExportPathKey = "org_fontc_exportPath"
 UseExportPathKey = "org_fontc_useExportPath"
 AdditionalOptionsKey = "org_fontc_additional_options"
 ExportRecentExportPathsKey = "org_fontc_recent_exportPaths"
-ClearBuildDirKey = "org_fontc_clear_build_dir"
+RemoveBuildDirKey = "org_fontc_rm_build_dir"
 
 GSAddParameterViewControllerClass = NSClassFromString("GSAddParameterViewController")
 
 
 def run_subprocess_in_macro_window(
-    command, check=False, show_window=False, capture_output=False
+    command, check=False, show_window=False, capture_output=False, echo=True,
 ):
     """Wrapper for subprocess.run that writes in real time to Macro output window"""
 
     if show_window:
         Glyphs.showMacroWindow()
 
-    # echo command
-    print(f"$ {' '.join(shlex.quote(str(arg)) for arg in command)}")
+    if echo:
+        # echo command
+        print(f"$ {' '.join(shlex.quote(str(arg)) for arg in command)}")
 
     # Start the subprocess asynchronously and redirect output to a pipe
     process = subprocess.Popen(
@@ -134,7 +135,7 @@ class FontcExport(FileFormatPlugin):
     def start(self):
         # Init user preferences if not existent and set default value
         Glyphs.registerDefault(ExportPathKey, os.path.expanduser("~/Documents"))
-        Glyphs.registerDefault(ClearBuildDirKey, False)
+        Glyphs.registerDefault(RemoveBuildDirKey, False)
 
         self.setupRecentExportPathsButton()
 
@@ -170,13 +171,19 @@ class FontcExport(FileFormatPlugin):
             menu.addItem_(item)
 
         item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
-            f"Reinstall fontc", "reinstallFontc:", ""
+            f"Remove old build directory", "removeBuildDir:", ""
         )
         item.setTarget_(self)
         menu.addItem_(item)
 
         item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
-            f"Clear build directory", "clearBuildDir:", ""
+            f"Print fontc version", "printFontcVersion:", ""
+        )
+        item.setTarget_(self)
+        menu.addItem_(item)
+
+        item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
+            f"Reinstall fontc", "reinstallFontc:", ""
         )
         item.setTarget_(self)
         menu.addItem_(item)
@@ -199,7 +206,17 @@ class FontcExport(FileFormatPlugin):
     def setUpFontc(self):
         fontcPath = self.fontcPath()
         if os.path.exists(fontcPath):
-            return fontcPath
+            installedVersion = self.installedVersion()
+            requiredVersion = self.requiredVersion()
+            if installedVersion == requiredVersion:
+                return fontcPath
+            else:
+                print(
+                    "fontc version mismatch: "
+                    f"installed {installedVersion} != required {requiredVersion}; "
+                    "re-installing"
+                )
+                self.removeFontc()
 
         scriptingHandler = GSScriptingHandler.sharedHandler()
         glyphsPythonPath = os.path.join(
@@ -258,24 +275,50 @@ class FontcExport(FileFormatPlugin):
         return distInfoDirs[0]
 
     @objc.python_method
-    def currentFontcVersion(self):
+    def installedVersion(self):
         distInfoPath = self.fontcDistInfoPath()
         if not distInfoPath:
-            return "[not installed]"
+            return None
         # strip the 'fontc-' prefix and '.dist-info' suffix to get version string
         return os.path.basename(distInfoPath)[6:-10]
+
+    @objc.python_method
+    def requiredVersion(self):
+        requirementsPath = os.path.join(
+            self.pluginResourcesDirPath(), "requirements.txt"
+        )
+        with open(requirementsPath) as f:
+            for line in f:
+                if line.startswith("fontc=="):
+                    return line[7:].split()[0]
+            else:
+                raise ValueError(f"Could not find 'fontc==' line in {requirementsPath}")
+
+    @objc.python_method
+    def removeFontc(self):
+        shutil.rmtree(os.path.dirname(self.fontcPath()))
+        distInfoPath = self.fontcDistInfoPath()
+        if distInfoPath:
+            shutil.rmtree(distInfoPath)
 
     def reinstallFontc_(self, sender):
         fontcPath = self.fontcPath()
         if os.path.exists(fontcPath):
-            print("Removed fontc; it will be re-downloaded on next export.")
-            shutil.rmtree(os.path.dirname(fontcPath))
-            distInfoPath = self.fontcDistInfoPath()
-            if distInfoPath:
-                shutil.rmtree(distInfoPath)
+            self.removeFontc()
+        Glyphs.showMacroWindow()
+        self.setUpFontc()
 
-    def clearBuildDir_(self, sender):
-        Glyphs.defaults[ClearBuildDirKey] = True
+    def removeBuildDir_(self, sender):
+        Glyphs.defaults[RemoveBuildDirKey] = True
+
+    def printFontcVersion_(self, sender):
+        fontcPath = self.fontcPath()
+        if os.path.exists(fontcPath):
+            run_subprocess_in_macro_window([fontcPath, "--vv"], show_window=True, echo=False)
+            print("package version:", self.installedVersion())
+        else:
+            Glyphs.showMacroWindow()
+            print(f"fontc {self.requiredVersion()}")
 
     @objc.IBAction
     def showAddOptionPopup_(self, sender):
@@ -301,9 +344,9 @@ class FontcExport(FileFormatPlugin):
             return False, "No export path"
 
         tempFolder = self.tempPath(font.familyName)
-        if os.path.isdir(tempFolder) and Glyphs.defaults[ClearBuildDirKey]:
+        if os.path.isdir(tempFolder) and Glyphs.defaults[RemoveBuildDirKey]:
             shutil.rmtree(tempFolder)
-            Glyphs.defaults[ClearBuildDirKey] = False
+            Glyphs.defaults[RemoveBuildDirKey] = False
         os.makedirs(tempFolder, exist_ok=True)
 
         tempFile = os.path.join(tempFolder, "font.glyphs")
