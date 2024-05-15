@@ -1,0 +1,65 @@
+(
+	{
+		identifier = "--incremental";
+		name = "Incremental Build";
+		text = "**Incremental Build**
+
+Whether to write intermediate representation (IR) to disk. Must be true if you want incremental compilation.";
+	},
+	{
+		identifier = "--prefer-simple-glyphs=false";
+		name = "Prefer Simple Glyphs";
+		text = "**Prefer Simple Glyphs**
+
+In cases where a source glyph uses a mixture of components and contours, convert all the components to contours [default: true] [possible values: true, false]";
+	},
+	{
+		identifier = "--flatten-components";
+		name = "Flatten Components";
+		text = "**Flatten Components**
+
+Eliminate component references to other glyphs using components (that is, nested components), emitting only component references to simple (contour) glyphs";
+	},
+	{
+		identifier = "--decompose-transformed-components";
+		name = "Decompose Transformed Components";
+		text = "**Decompose Transformed Components**
+
+Whether all components with a non-identity 2x2 transform will be converted to outlines";
+	},
+	{
+		identifier = "--no-production-names";
+		name = "No Production Names";
+		text = "**No Production Names**
+		
+Don't rename glyphs with production names";
+	},
+	{
+		identifier = "--keep-direction";
+		name = "Keep Direction";
+		text = "**Keep Direction**
+
+Whether to keep the original glyph contour direction (TTF only)";
+	},
+	{
+		identifier = "--skip-features";
+		name = "Skip Features";
+		text = "**Skip Features**
+
+Set to skip compilation of OpenType Layout features";
+	},
+	{
+		identifier = "--emit-timing";
+		name = "Emit Timing";
+		text = "**Emit Timing**
+
+Whether to out timing data, notably a visualization of threadpool execution of tasks";
+	},
+	{
+		identifier = "--emit-debug";
+		name = "Emit Debug";
+		text = "**Emit Debug**
+
+Whether to write additional debug files to disk";
+	},
+)
