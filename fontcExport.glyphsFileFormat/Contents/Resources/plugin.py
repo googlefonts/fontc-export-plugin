@@ -170,7 +170,7 @@ class FontcExport(FileFormatPlugin):
             menu.addItem_(item)
 
         item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
-            f"Update fontc", "updateFontc:", ""
+            f"Reinstall fontc", "reinstallFontc:", ""
         )
         item.setTarget_(self)
         menu.addItem_(item)
@@ -214,7 +214,8 @@ class FontcExport(FileFormatPlugin):
             "--disable-pip-version-check",
             "--target",
             self.pluginResourcesDirPath(),
-            "fontc",
+            "-r",
+            os.path.join(self.pluginResourcesDirPath(), "requirements.txt"),
         ]
         run_subprocess_in_macro_window(installCommand, check=True)
 
@@ -264,7 +265,7 @@ class FontcExport(FileFormatPlugin):
         # strip the 'fontc-' prefix and '.dist-info' suffix to get version string
         return os.path.basename(distInfoPath)[6:-10]
 
-    def updateFontc_(self, sender):
+    def reinstallFontc_(self, sender):
         fontcPath = self.fontcPath()
         if os.path.exists(fontcPath):
             print("Removed fontc; it will be re-downloaded on next export.")
