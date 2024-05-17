@@ -2,7 +2,12 @@
 
 An export plugin for Glyphs that uses [fontc](https://github.com/googlefonts/fontc) to export fonts. When installed, it shows up in the regular Export dialog (Cmd+E).
 
-It downloads a standalone fontc executable inside the plugin, which is removed when the plugin is deleted. 
+It downloads a standalone fontc executable inside the plugin, which is removed when the plugin is deleted.
+
+fontc is a font compiler written in Rust which is designed to be 10x or more faster than
+fontmake, our other font compiler written in Python.
+Please note that the font compiler is not production-ready yet. You can follow development
+progress on the [upstream Github repository](https://github.com/googlefonts/fontc).
 
 ![export dialog](exportDialog.png)
 
