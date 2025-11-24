@@ -63,10 +63,8 @@ jobs:
         if: steps.check.outputs.already_updated == 'false'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.AUTOMATION_PAT }}
           commit-message: "bump fontc to v${{ steps.version.outputs.version }}"
-          author: Cosimo Lupo <anthrotype@users.noreply.github.com>
-          committer: Cosimo Lupo <anthrotype@users.noreply.github.com>
           branch: auto-update-fontc-${{ steps.version.outputs.version }}
           delete-branch: true
           title: "Update fontc to v${{ steps.version.outputs.version }}"
