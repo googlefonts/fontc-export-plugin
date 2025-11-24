@@ -1,0 +1,79 @@
+name: Auto-update fontc
+
+on:
+  # Triggered by fontc repo when a new release is published
+  # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#repository_dispatch
+  repository_dispatch:
+    types: [fontc-release]
+
+  # Manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      fontc_version:
+        description: 'fontc version to update to (e.g., 0.3.2)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-fontc:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout plugin repo
+        uses: actions/checkout@v4
+
+      - name: Set up version variables
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            VERSION="${{ github.event.client_payload.version }}"
+          else
+            VERSION="${{ inputs.fontc_version }}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Updating to fontc version: $VERSION"
+
+      - name: Check if update needed
+        id: check
+        run: |
+          CURRENT_VERSION=$(cat FONTC_VERSION)
+          NEW_VERSION="${{ steps.version.outputs.version }}"
+
+          if [ "$CURRENT_VERSION" = "$NEW_VERSION" ]; then
+            echo "already_updated=true" >> $GITHUB_OUTPUT
+            echo "Current version $CURRENT_VERSION is same as new version, skipping update"
+          else
+            echo "already_updated=false" >> $GITHUB_OUTPUT
+            echo "Updating from $CURRENT_VERSION to $NEW_VERSION"
+          fi
+
+      - name: Run update script
+        if: steps.check.outputs.already_updated == 'false'
+        run: ./scripts/update-fontc-version.sh "${{ steps.version.outputs.version }}"
+
+      - name: Run validation
+        if: steps.check.outputs.already_updated == 'false'
+        run: ./scripts/validate-update.sh
+
+      - name: Create Pull Request
+        if: steps.check.outputs.already_updated == 'false'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "bump fontc to v${{ steps.version.outputs.version }}"
+          branch: auto-update-fontc-${{ steps.version.outputs.version }}
+          delete-branch: true
+          title: "Update fontc to v${{ steps.version.outputs.version }}"
+          body: |
+            Automated update of fontc to version ${{ steps.version.outputs.version }}.
+
+            This PR was automatically created by the auto-update workflow.
+
+            ## Changes
+            - Updated `FONTC_VERSION` to ${{ steps.version.outputs.version }}
+            - Updated `requirements.txt` from fontc release
+            - Bumped plugin version numbers in `Info.plist`
