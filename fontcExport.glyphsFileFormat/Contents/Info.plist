@@ -13,9 +13,9 @@
 	<key>CFBundleName</key>
 	<string>fontc Export</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.5</string> <!-- 1.0 -->
+	<string>0.6</string>
 	<key>CFBundleVersion</key>
-	<string>6</string> <!-- 123 -->
+	<string>7</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright, Georg Seifert, 2023</string>
 	<key>NSPrincipalClass</key>
