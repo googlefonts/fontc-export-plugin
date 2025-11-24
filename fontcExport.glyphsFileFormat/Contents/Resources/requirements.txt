@@ -1,8 +1,10 @@
 --only-binary :all:
 
-fontc==0.3.1 \
-    --hash=sha256:2cecd0a8ce84ac34ae47332212f71c0e14de9330c7dd1ee56a9fc7ea194f3c12 \
-    --hash=sha256:432f0b4ad4fb60c3e2caaeaee4490d8ac8fc09161be96a37ae4240e26461b52b \
-    --hash=sha256:93412e541aa813a4f35ac736470ac9456b0ee03b4ea8779abd7912961abc5543 \
-    --hash=sha256:bb05ec02d5fe4dfa988aa564f7c88e67e9ccf8eddd5be26ecfc62d3e659d6847 \
-    --hash=sha256:e2e4353dff95743d88bbb39e86f28274c1141cfde902f34fb080946137fd6c61
+fontc==0.5.0 \
+    --hash=sha256:06dc78b5a2324313a0a26876247af049becd66823fe2513755c2b39a1f33cad2 \
+    --hash=sha256:33fd54e7a53d76b2e8e0d0f6c31bbac0b6e5b70dc4557eb45b3424cd34e937a7 \
+    --hash=sha256:3bcadcd3eb986f6e9ee1a8dcf11e1a28ec95a56ccb336025f181594473a336cd \
+    --hash=sha256:8dae0dbf7793cb1b54b8d7931f3d562f78576d1f000b5ec6a1adc5db423813c3 \
+    --hash=sha256:aa52ac539c17ea228d6b86cdefb8ffa0747f2ae3cac6ea0ecfbd9cc0a764f4bb \
+    --hash=sha256:aee72b2efd142fde35f26b5e6f4bd7de59667fc0560fd749cf7e28f4ba372ac8 \
+    --hash=sha256:e23f191e95c87dc1b2dbed29f125cd3c40b36c32fd3cd77cb7dd9069c3125017
