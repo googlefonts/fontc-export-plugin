@@ -21,6 +21,7 @@ permissions:
 jobs:
   update-fontc:
     runs-on: macos-latest
+    environment: fontc-export-glyphs-automation
 
     steps:
       - name: Checkout plugin repo
