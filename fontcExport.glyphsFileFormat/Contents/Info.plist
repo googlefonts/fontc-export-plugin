@@ -24,5 +24,7 @@
 	<array>
 		<string>plugin.py</string>
 	</array>
+	<key>UpdateFeedURL</key>
+	<string>https://raw.githubusercontent.com/googlefonts/fontc-export-plugin/main/fontcExport.glyphsFileFormat/Contents/Info.plist</string>
 </dict>
 </plist>
