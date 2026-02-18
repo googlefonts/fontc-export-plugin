@@ -31,28 +31,33 @@ jobs:
         id: version
         run: |
           if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            VERSION="${{ github.event.client_payload.version }}"
+            VERSION="${GITHUB_EVENT_CLIENT_PAYLOAD_VERSION}"
           else
-            VERSION="${{ inputs.fontc_version }}"
+            VERSION="${INPUTS_FONTC_VERSION}"
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Updating to fontc version: $VERSION"
+        env:
+          GITHUB_EVENT_CLIENT_PAYLOAD_VERSION: ${{ github.event.client_payload.version }}
+          INPUTS_FONTC_VERSION: ${{ inputs.fontc_version }}
 
       - name: Validate version format
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
+          VERSION="${STEPS_VERSION_OUTPUTS_VERSION}"
           if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "ERROR: Invalid version format: $VERSION"
             echo "Expected format: X.Y.Z (e.g., 0.5.0)"
             exit 1
           fi
           echo "Version validated: $VERSION"
+        env:
+          STEPS_VERSION_OUTPUTS_VERSION: ${{ steps.version.outputs.version }}
 
       - name: Check if update needed
         id: check
         run: |
           CURRENT_VERSION=$(cat FONTC_VERSION)
-          NEW_VERSION="${{ steps.version.outputs.version }}"
+          NEW_VERSION="${STEPS_VERSION_OUTPUTS_VERSION}"
 
           if [ "$CURRENT_VERSION" = "$NEW_VERSION" ]; then
             echo "already_updated=true" >> $GITHUB_OUTPUT
@@ -61,10 +66,14 @@ jobs:
             echo "already_updated=false" >> $GITHUB_OUTPUT
             echo "Updating from $CURRENT_VERSION to $NEW_VERSION"
           fi
+        env:
+          STEPS_VERSION_OUTPUTS_VERSION: ${{ steps.version.outputs.version }}
 
       - name: Run update script
         if: steps.check.outputs.already_updated == 'false'
-        run: ./scripts/update-fontc-version.sh "${{ steps.version.outputs.version }}"
+        run: ./scripts/update-fontc-version.sh "${STEPS_VERSION_OUTPUTS_VERSION}"
+        env:
+          STEPS_VERSION_OUTPUTS_VERSION: ${{ steps.version.outputs.version }}
 
       - name: Run validation
         if: steps.check.outputs.already_updated == 'false'
