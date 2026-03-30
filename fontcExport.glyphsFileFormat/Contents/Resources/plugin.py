@@ -234,7 +234,18 @@ class FontcExport(FileFormatPlugin):
             "-r",
             os.path.join(self.pluginResourcesDirPath(), "requirements.txt"),
         ]
-        run_subprocess_in_macro_window(installCommand, check=True)
+        try:
+            run_subprocess_in_macro_window(installCommand, check=True)
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                "\nThere is a known issue with the Glyphs Python plugin that "
+                "prevents `pip` from working correctly. This has been fixed in "
+                "the latest version of the Python plugin.\n"
+                "You can try to force the upgrade by going to: "
+                "Window -> Plugin Manager -> Modules, then click the red "
+                "'REMOVE' button next to the 'Python' plugin, then 'INSTALL' and "
+                "finally restart Glyphs app.\n"
+            ) from e
 
         assert os.path.exists(fontcPath), "fontc not found after installation"
         return fontcPath
