@@ -9,25 +9,23 @@
 #
 ###########################################################################################################
 
-import objc, os, subprocess
-from GlyphsApp import *
-from GlyphsApp import GSScriptingHandler
-from GlyphsApp.plugins import *
-from Foundation import (
-    NSMutableOrderedSet,
-    NSClassFromString,
-    NSZeroRect,
-    NSMaxXEdge,
-    NSArray,
-    NSAttributedString,
-)
-from AppKit import NSImageNameFolder, NSPopover, NSPopoverBehaviorTransient
+import objc
+import os
+import subprocess
+from GlyphsApp import Glyphs, GSGlyphsInfo, GetFolder
+#from GlyphsApp import GSScriptingHandler
+from GlyphsApp.plugins import FileFormatPlugin
+from Cocoa import NSMutableOrderedSet, NSClassFromString, NSZeroRect, NSMakeSize, NSMaxXEdge, NSArray, NSAttributedString, NSImage
+
+from AppKit import NSMenuItem, NSImageNameFolder, NSPopover, NSPopoverBehaviorTransient
 from io import StringIO
 from pathlib import Path
 import glob
 import shlex
 import shutil
 import sys
+
+GSScriptingHandler = objc.lookUpClass("GSScriptingHandler")
 
 # Preference key names
 ExportPathKey = "org_fontc_exportPath"
@@ -171,19 +169,19 @@ class FontcExport(FileFormatPlugin):
             menu.addItem_(item)
 
         item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
-            f"Remove old build directory", "removeBuildDir:", ""
+            "Remove old build directory", "removeBuildDir:", ""
         )
         item.setTarget_(self)
         menu.addItem_(item)
 
         item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
-            f"Print fontc version", "printFontcVersion:", ""
+            "Print fontc version", "printFontcVersion:", ""
         )
         item.setTarget_(self)
         menu.addItem_(item)
 
         item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(
-            f"Reinstall fontc", "reinstallFontc:", ""
+            "Reinstall fontc", "reinstallFontc:", ""
         )
         item.setTarget_(self)
         menu.addItem_(item)
