@@ -13,7 +13,6 @@ import objc
 import os
 import subprocess
 from GlyphsApp import Glyphs, GSGlyphsInfo, GetFolder
-#from GlyphsApp import GSScriptingHandler
 from GlyphsApp.plugins import FileFormatPlugin
 from Cocoa import NSMutableOrderedSet, NSClassFromString, NSZeroRect, NSMakeSize, NSMaxXEdge, NSArray, NSAttributedString, NSImage
 
