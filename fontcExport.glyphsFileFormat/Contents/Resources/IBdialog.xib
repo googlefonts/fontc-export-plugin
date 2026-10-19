@@ -9,7 +9,6 @@
             <connections>
                 <outlet property="dialog" destination="0uz-PR-nvh" id="mLy-5f-d0K"/>
                 <outlet property="recentExportPathsButton" destination="Rlh-zW-7E1" id="H0N-rj-ksh"/>
-                <outlet property="view" destination="0uz-PR-nvh" id="7In-QF-9hO"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
